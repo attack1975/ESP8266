@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LED Lines</title>
+  <link rel="stylesheet" href="/jquery.mobile.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/960.css">
+  
+    <script src="/jquery.min.js"></script>
+    <script src="/jquery.h.min.js"></script>
+    
+  <script>
+    $(document).bind('mobileinit',function(){
+        $.mobile.pushStateEnabled = false;
+    });
+</script>
+  <script src="/jquery.m.min.js"></script>
+</head>
+<body style="height:100%">
+
+
+<div data-role="page" id="page1">
+  <div data-role="header" id="header">
+   <div class="batterystyle" id="battery">
+   	<div class="batteryperc"> </div>
+   </div>
+   
+   <h1 id="title">LED Lines - Led Cap!</h1> <h3 id="buildnr"></h3>
+  </div>
+  <div id="main" role="main" class="ui-content">
+	
+	
+	<ul data-role="listview" data-inset="true">
+		<li data-role="list-divider" style="display:none">  <div id="ledscreen"> </div> </li>
+		
+	    <div data-role="collapsible-set">
+		  <li data-role="collapsible" data-collapsed="false">
+		  <h3>Basic</h3>
+		  
+		  <ul data-role="listview"> 
+	      <li>
+	       <h3 class="ui-bar ui-bar-a">Brightness:</h3>
+	       <input class="slider" id="brightness" value="0" type="range" min="0" max="100" step="5" />
+	      </li>
+			
+		  <li>
+		  <h3 class="ui-bar ui-bar-a">Flicker:</h3>
+	      <div class="onoffswitch">
+	      <select id="flicker"  name="flag" data-role="slider">
+	          <option value="off" selected="selected">OFF</option>
+	          <option value="on" >ON</option>
+	        </select>
+	      </div> 
+	      </li>
+	      
+	      
+	      <li  id="flicker_speed_container" >
+		  <h3 class="ui-bar ui-bar-a">Flicker speed:</h3>
+	      <input class="slider" id="flicker_speed" type="range" value="0" min="1" max="100" step="1" />
+	      </li>
+	      
+	      
+	      <li>
+		  <h3 class="ui-bar ui-bar-a">Fade:</h3>
+	      <div class="onoffswitch">
+	      <select id="fade"  name="flag" data-role="slider">
+	          <option value="off" selected="selected">OFF</option>
+	          <option value="on" >ON</option>
+	        </select>
+	      </div> 
+	      </li>
+	      
+	      <li  id="fade_speed_container" >
+		  <h3 class="ui-bar ui-bar-a">Fade speed:</h3>
+	      <input class="slider" id="fade_speed" type=range value="0" min="1" max="20" step="1" />
+	      </li>
+	      </ul>
+	    </li>
+	    
+	    <li data-role="collapsible">
+	      <h3>Text</h3>
+	  	  <ul data-role="listview">
+	      <li>
+	      <h3 class="ui-bar ui-bar-a">Text:</h3>
+	      <div id="textshort"></div>
+	      <div id="block"><input id="input_text" type="text" /> <button id="button_send" >Send</button><button id="button_clear" onClick="javascript:clearScreen();" >Clear</button>  </div>
+	      </li>
+	
+		
+	      <li id="text_color_container">
+	      <h3 class="ui-bar ui-bar-a">Text color:</h3>
+	      <input   onfocus="blur();" id="font-color" /> 
+	      </li>
+	      
+	          <li id="text_speed_container">
+	      <h3 class="ui-bar ui-bar-a">Text speed:</h3>
+	      <input id="text_speed" class="slider" type="range" value="0" min="1" max="15" step="1" />
+	      </li>
+	      
+	    <li id="text_scroll_container">
+	  	 <h3 class="ui-bar ui-bar-a">Text scoll multiple:</h3>
+		  <div class="onoffswitch">
+	      <select id="textspanmultiple"  name="flag" data-role="slider">
+	          <option value="off" selected="selected">OFF</option>
+	          <option value="on" >ON</option>
+	        </select>
+	      </div> 
+	    </li>  
+	      
+	  	<li id="text_font_container">
+	  	 <h3 class="ui-bar ui-bar-a">Big font:</h3>
+		  <div class="onoffswitch">
+	      <select id="textsize"  name="flag" data-role="slider">
+	          <option value="off" selected="selected">OFF</option>
+	          <option value="on" >ON</option>
+	        </select>
+	      </div> 
+	    </li>
+	    
+	
+	      </ul>
+	    </li>  
+	    
+	    <li data-role="collapsible">
+	      <h3>Animations</h3>
+	      
+	  	  <ul data-role="listview">
+	      <li>
+	      
+	      <h3 class="ui-bar ui-bar-a">Animation:</h3>
+	      
+	      <div id="animation_picker"></div>
+	      </li>
+	      
+	      <li id="animation_speed_container">
+	      <h3 class="ui-bar ui-bar-a">Animation speed:</h3>
+	      <input class="slider" id="animation_speed" type="range" value="0" min="1" max="50" step="1" />
+	      </li>
+	      
+	      <li id="random_toggle">
+	  	 <h3 class="ui-bar ui-bar-a">Animation slideshow:</h3>
+		  <div class="onoffswitch">
+	      <select id="animation_random"  name="flag" data-role="slider">
+	          <option value="off" selected="selected">OFF</option>
+	          <option value="on" >ON</option>
+	        </select>
+	      </div> 
+	    </li>
+	    
+	    <li id="random_speed_container">
+	   		<h3 class="ui-bar ui-bar-a">Slideshow speed:</h3>
+	        <input class="slider" id="random_speed" type="range" value="0" min="1" max="50" step="1" />
+	    </li>
+	      
+	      
+	    <li id="random_choise_container">
+	    	<h3 class="ui-bar ui-bar-a">Slideshow choises:</h3>
+			<select multiple="multiple" data-native-menu="false" id="random_choise">
+				<option value="all" selected>All.</option>
+			</select>
+		</li>
+	
+      </ul>
+    </li>
+   
+
+
+	    <li data-role="collapsible">
+	      <h3>Games</h3>
+	  	  <ul data-role="listview">
+	  	      
+			    <li id="sync_toggle">
+			  	 <h3 class="ui-bar ui-bar-a">Snake:</h3>
+				
+			       <div class="onoffswitch">
+				      <select id="game_snake"  name="flag" data-role="slider">
+				          <option value="off" selected="selected">OFF</option>
+				          <option value="on" >ON</option>
+				        </select>
+				      </div>
+				      
+				      <h3 class="ui-bar ui-bar-a">Tetris:</h3> 
+				        <div class="onoffswitch">
+				      <select id="game_tetris"  name="flag" data-role="slider">
+				          <option value="off" selected="selected">OFF</option>
+				          <option value="on" >ON</option>
+				        </select>
+				      </div> 
+				      
+			    </li>
+			    
+			    <li id="game_controls">
+			  	  <h3 class="ui-bar ui-bar-a">Game controls:</h3>
+			  	  	<div class="block">
+  				   	<button style="padding:1.5em;" id="game_up" >UP</button>
+  				   	</div>
+  				   	<div style="width:100%" class="block">
+  				   	<button style="float:left; padding:1.5em; width:50%" id="game_left" >LEFT</button>
+  				   	<button  style="float:left; padding:1.5em; width:50%" id="game_right" >RIGHT</button>
+  				   	</div>
+  				   	<div class="block">
+  				   	<button style="padding:1.5em;" id="game_down" >DOWN</button>
+  				   	</div>
+			    </li>
+			    
+	      </ul>
+	    </li>
+	    
+	    
+	    <li data-role="collapsible">
+	      <h3>Settings</h3>
+	  	  <ul data-role="listview">
+  	  			  <li>
+				  <h3 class="ui-bar ui-bar-a">Extra Bright:</h3>
+			      <div class="onoffswitch">
+			      <select id="extra_bright"  name="flag" data-role="slider">
+			          <option value="off" selected="selected">OFF</option>
+			          <option value="on" >ON</option>
+			        </select>
+			      </div> 
+			      </li>
+				      
+			    <li id="debug_console_container">
+				 <h3 class="ui-bar ui-bar-a">Debug console:</h3>
+				  <div class="onoffswitch">
+			      <select id="console_output"  name="flag" data-role="slider">
+			          <option value="off" selected="selected">OFF</option>
+			          <option value="on" >ON</option>
+			        </select>
+			      </div> 
+			    </li>
+   				<li>
+				 <h3 class="ui-bar ui-bar-a">WiFi AP settings:</h3>
+				  <div id="block">SSID:<input id="input_ap_ssid" type="text" /></div>
+                    <div id="block">Password:<input id="input_ap_password" type="text" /></div>
+				   <button id="button_ap_save" >Save</button>
+			    </li>
+			    
+			     <li id="clientconnect_toggle">
+			  	 <h3 class="ui-bar ui-bar-a">Connect to client:</h3>
+				  <div class="onoffswitch">
+			      <select id="clientconnect"  name="flag" data-role="slider">
+			          <option value="off" selected="selected">OFF</option>
+			          <option value="on" >ON</option>
+			        </select>
+			      </div> 
+			    
+			    </li>
+			     <li id="ipsetting_toggle">
+			  	 <h3 id="iptext" class="ui-bar ui-bar-a">Connect to client:</h3>
+			    </li>
+			  
+			    
+			    <li>
+				 <h3 class="ui-bar ui-bar-a">WiFi Client settings:</h3>
+				  <div id="block">SSID:<input id="input_client_ssid" type="text" /></div>
+                    <div id="block">Password:<input id="input_client_password" type="text" /></div>
+				   <button id="button_client_save" >Save</button>
+			    </li>
+			      <li>
+			 		<button id="button_wifi_connect" >Connect to Client</button>
+			    </li>
+			    <li id="sync_toggle">
+			  	 <h3 class="ui-bar ui-bar-a">Sync to other:</h3>
+				  <div class="onoffswitch">
+			      <select id="sync_all"  name="flag" data-role="slider">
+			          <option value="off" selected="selected">OFF</option>
+			          <option value="on" >ON</option>
+			        </select>
+			      </div> 
+			    </li>
+			    
+			    
+			    
+	      </ul>
+	    </li>
+	    
+	    <li id="console_container" data-role="collapsible">
+	      <h3>Console</h3>
+	  	  <ul data-role="listview">
+	  	   		<li id="sync_toggle">
+			  	 <h3 class="ui-bar ui-bar-a">Console:</h3>
+				  <div id="console" style="width:100%; height:700px; overflow:scroll; float:left;">
+				  		
+				  </div>
+				 </li>
+	  	  </ul>
+	  	</li>
+	    
+      </div>
+    </ul>
+  </div>
+</div>
+
+<script src="socket.js"></script>
+<script src="snake.js"></script>
+<script src="tetris.js"></script>
+<script src="flash.js"></script>
+
+</body>
+</html>
+
+
+
+

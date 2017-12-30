@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>page demo</title>
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    
+  <script>
+    $(document).bind('mobileinit',function(){
+        $.mobile.pushStateEnabled = false;
+    });
+</script>
+  <script src="socket.js"></script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+	<nav>
+		<ul>
+			<li><a href="">General</a></li>
+			<li><a href="">Settings</a></li>
+		</ul>
+	</nav>
+
+
+	<article>
+
+
+<div data-role="page" id="page1">
+  <div data-role="header">
+   <h1>DigiT-Shirt</h1>
+  </div>
+  <div id="main" role="main" class="ui-content">
+
+
+	<ul data-role="listview">
+	    <div data-role="collapsible-set">
+	  <li data-role="collapsible" data-collapsed="false">
+	  <h3>Basic</h3>
+	  
+	  <ul data-role="listview"> 
+      <li>
+       <h3 class="ui-bar ui-bar-a">Brightness:</h3>
+       <input class="slider" id="brightness" value="0" type="range" min="0" max="255" step="10" />
+      </li>
+		
+	  <li>
+	  <h3 class="ui-bar ui-bar-a">Flicker:</h3>
+      <div class="onoffswitch">
+      <select id="flicker"  name="flag" data-role="slider">
+          <option value="off" selected="selected">OFF</option>
+          <option value="on" >ON</option>
+        </select>
+      </div> 
+      </li>
+      
+      
+      <li>
+	  <h3 class="ui-bar ui-bar-a">Flicker speed:</h3>
+      <input class="slider" id="flicker_speed" type="range" value="0" min="1" max="10" step="1" />
+      </li>
+      
+      
+      <li>
+	  <h3 class="ui-bar ui-bar-a">Fade:</h3>
+      <div class="onoffswitch">
+      <select id="fade"  name="flag" data-role="slider">
+          <option value="off" selected="selected">OFF</option>
+          <option value="on" >ON</option>
+        </select>
+      </div> 
+      </li>
+      
+      <li>      
+	  <h3 class="ui-bar ui-bar-a">Fade speed:</h3>
+      <input class="slider" id="fade_speed" type=range value="0" min="1" max="10" step="1" />
+      </li>
+      </ul>
+    </li>
+    
+    <li data-role="collapsible">
+      <h3>Text</h3>
+  	  <ul data-role="listview">
+      <li>
+      <h3 class="ui-bar ui-bar-a">Text:</h3>
+      <div id="block"><input id="input_text" type="text" /> <button id="button_send" >Send</button> </div>
+      </li>
+
+      <li>
+      <h3 class="ui-bar ui-bar-a">Text speed:</h3>
+      <input id="text_speed" class="slider" type="range" value="0" min="1" max="10" step="1" />
+      </li>
+      </ul>
+    </li>  
+    
+    <li data-role="collapsible">
+      <h3>Animations</h3>
+  	  <ul data-role="listview">
+      <li>
+      
+      <h3 class="ui-bar ui-bar-a">Animation:</h3>
+      <select id="animation"  name="element" id="element">
+      	<option value="1">None</option>
+      	<option value="2">Second Option</option>
+      	<option value="3">Third Option</option>
+      	<option value="4">Fourth Option</option>
+      	<option value="5">Fifth Option</option>
+      	<option value="6">Six Option</option>
+      	<option value="7">Seven  Option</option>
+      </select>
+      </li>
+
+      <li>
+      <h3 class="ui-bar ui-bar-a">Animation speed:</h3>
+      <input class="slider" id="animation_speed" type="range" value="0" min="0" max="20" step="1" />
+      </li>
+      </ul>
+    </li>
+      </div>
+    </ul>
+  
+  </div>
+  <div data-role="footer">
+    <h1></h1>
+  </div>
+</div>
+</article>
+
+</body>
+</html>
+
+
+
+

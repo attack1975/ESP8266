@@ -1,0 +1,34 @@
+body {
+background-color:#cccccc;
+}
+.ui-content, .ui-page, #page1, .ui-mobile-viewport, .ui-overlay-a {
+background-color:#cccccc;
+}
+
+.ui-page-theme-a .ui-bar-inherit  {
+background-color:#888888;
+}
+
+.batterystyle {
+	margin-top:8px;
+	margin-left:8px;
+	width:80px;
+	height: 20px;
+	float: left;
+	border: 3px solid black;
+	border-radius: 8px;
+}
+
+.batteryperc {
+	
+	background:green; width: 100%; height:100%;
+}
+#textshort span {
+    margin-left: 25px;
+    font-weight: 800;
+}
+    
+.ui-header .ui-title, .ui-footer .ui-title {
+color:black;
+text-shadow: 0 1px 0 #BBB;
+}

@@ -11,12 +11,16 @@ typedef struct {
 	int filepos;
 	int websocket;
 	int pos;
+	char is_spi;
+	char is_gif;
+	char spi_num;
 } connections;
 
-connections* findWebsocketConnection();
-void deleteConnection(struct tcp_pcb* pcb);
-connections* newConnection(struct tcp_pcb* pcb);
-connections* getConnectionOffset(struct tcp_pcb * pcb, int off);
-connections* getConnection(struct tcp_pcb * pcb);
-connections** getConnectionsBegin();
+void deleteConnection(connections * connection_list[HTTP_POOL], struct tcp_pcb* pcb);
+connections* newConnection(connections * connection_list[HTTP_POOL], struct tcp_pcb* pcb);
+connections* getConnectionOffset(connections * connection_list[HTTP_POOL], struct tcp_pcb * pcb, int off);
+connections* getConnection(connections * connection_list[HTTP_POOL], struct tcp_pcb * pcb);
+int getConnectionSize(connections * connection_list[HTTP_POOL]);
+int getConnectionSizeWebsocket(connections * connection_list[HTTP_POOL]);
+connections** getConnectionsBegin(connections * connection_list[HTTP_POOL]);
 #endif

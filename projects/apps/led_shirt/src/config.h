@@ -22,7 +22,7 @@
 #define TEXTHEIGHT 8
 
 #define BUFFERS 3
-#define COLUMNS 15
+#define COLUMNS 16
 #define COLORS 3
 
 #define VERBOSE 1

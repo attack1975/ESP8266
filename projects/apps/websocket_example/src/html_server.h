@@ -5,13 +5,13 @@
 #include "lwip/tcp.h"
 #include "lwip/pbuf.h"
 
-typedef void  (*websocket_gotdata)(char *data, int size);
+typedef void  (*websocket_gotdata)(char *data, int size, connections *pcb);
 
 void server_init(websocket_gotdata call);
 
 static err_t server_accept(void *arg, struct tcp_pcb *pcb, err_t err);
 static err_t server_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
-static err_t server_poll(void *arg, struct tcp_pcb *pcb);
+err_t server_poll(void *arg, struct tcp_pcb *tpcb);
 static void server_err(void *arg, err_t err);
 static err_t server_sent(void *arg, struct tcp_pcb *pcb, u16_t len);
 

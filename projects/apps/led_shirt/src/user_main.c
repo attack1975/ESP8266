@@ -23,6 +23,8 @@
 #include "httpclient.h"
 #include "log.h"
 #include "ws2812_i2s.h"
+#include "driver/i2c_oled.h"
+#include "driver/i2c.h"
 
 #define os_intr_lock ets_intr_lock
 #define os_intr_unlock ets_intr_unlock
@@ -32,7 +34,7 @@ static ETSTimer framerefreshTimer;
 static ETSTimer timeTimer;
 
 
-int brightness = 5;
+int brightness = 20;
 int fontbackR = 0;
 int fontbackG = 0;
 int fontbackB = 0;
@@ -68,7 +70,7 @@ int32 refreshMutext = 0;
 
 int FRAME_REFRESH_SPEED =  (1000 / FRAMESPEED); // lets assume 5us for framereset
 
-long framecount = 0;
+long animation_current_framecount = 0;
 long textframeoffset = 0;
 
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
@@ -370,6 +372,7 @@ void ICACHE_FLASH_ATTR timeCb() {
 
 void ICACHE_FLASH_ATTR refreshFrameCb() {
 	os_timer_disarm(&framerefreshTimer);
+//	os_printf("DATA: %d %d \r\n", read_byte(0x00), read_byte(0x01));
 
 	int flicker = 0;
 
@@ -387,7 +390,7 @@ void ICACHE_FLASH_ATTR refreshFrameCb() {
 		write_texttowall(0, 0, textframeoffset, fontR, fontG, fontB, fontbackR, fontbackG, fontbackB);
 	}
 	system_soft_wdt_feed();
-	if(MODEFLASH == FLICKER && (framecount % (flashspeed + 1)) < ((flashspeed+2) / 2)) {
+	if(MODEFLASH == FLICKER && (animation_current_framecount % (flashspeed + 1)) < ((flashspeed+2) / 2)) {
 		flicker = 1;
 	}
 
@@ -412,7 +415,7 @@ void ICACHE_FLASH_ATTR refreshFrameCb() {
 
 	}
 
-	if(MODE == FLICKER_BUFFER && (framecount % (flashspeedicons * 2 )) == 0) {
+	if(MODE == FLICKER_BUFFER && (animation_current_framecount % (flashspeedicons * 2 )) == 0) {
 		if(activebuffer == 1) {
 			activebuffer = 2;
 		} else if(activebuffer == 2) {
@@ -420,10 +423,10 @@ void ICACHE_FLASH_ATTR refreshFrameCb() {
 		}
 	}
 
-	if(framecount % flashspeedtext == 0) {
+	if(animation_current_framecount % flashspeedtext == 0) {
 		textframeoffset++;
 	}
-	framecount++;
+	animation_current_framecount++;
 
 	if(bufferplay == 1 && bufferrecord == 0 && bufferframes != 0 && activebuffer != 0) {
 			framebuffertmp = framebuffertmp + 2;
@@ -463,6 +466,7 @@ void ICACHE_FLASH_ATTR refreshFrameCb2() {
 	ReleaseMutex(&refreshMutext);
 	os_timer_setfn(&framerefreshTimer, refreshFrameCb, NULL);
 	os_timer_arm(&framerefreshTimer, FRAME_REFRESH_SPEED/2, 0);
+
 }
 
 
@@ -550,7 +554,7 @@ void ICACHE_FLASH_ATTR udp_receiver(void *arg, struct udp_pcb *pcb, struct pbuf 
 						LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting mode to normal");
 					}
 					pulsecount = 0;
-					framecount = 0;
+					animation_current_framecount = 0;
 					break;
 				case 0x03:
 					if(pusrdata[1] == 0x00) {
@@ -561,7 +565,7 @@ void ICACHE_FLASH_ATTR udp_receiver(void *arg, struct udp_pcb *pcb, struct pbuf 
 						LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting mode to normal");
 					}
 					pulsecount = 0;
-					framecount = 0;
+					animation_current_framecount = 0;
 					break;
 				case 0x04:
 					if(pusrdata[1] > 19) {
@@ -573,14 +577,14 @@ void ICACHE_FLASH_ATTR udp_receiver(void *arg, struct udp_pcb *pcb, struct pbuf 
 					LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting speed: %d", (20 - pusrdata[1]));
 					flashspeed = 20 - pusrdata[1];
 					pulsecount = 0;
-					framecount = 0;
+					animation_current_framecount = 0;
 					break;
 
 				case 0x05:
 					LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting dim level: %d", pusrdata[1]);
 					brightness = pusrdata[1];
 					pulsecount = 0;
-					framecount = flashspeed / 2;
+					animation_current_framecount = flashspeed / 2;
 					break;
 				case 0x06:
 					if(pusrdata[1] > 19) {
@@ -618,7 +622,7 @@ void ICACHE_FLASH_ATTR udp_receiver(void *arg, struct udp_pcb *pcb, struct pbuf 
 						LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting mode to normal");
 					}
 					pulsecount = 0;
-					framecount = 0;
+					animation_current_framecount = 0;
 					break;
 				case 0x0B:
 					if(pusrdata[1] > 19) {
@@ -637,7 +641,7 @@ void ICACHE_FLASH_ATTR udp_receiver(void *arg, struct udp_pcb *pcb, struct pbuf 
 					LOG_I(LOG_UDP,  LOG_UDP_TAG, "Setting fade speed: %d", ( pusrdata[1]));
 					flashspeedfade = pusrdata[1];
 					pulsecount = 0;
-					framecount = 0;
+					animation_current_framecount = 0;
 					break;
 				case 0x0D:
 					if(pusrdata[1] > 19) {
@@ -807,25 +811,33 @@ void ICACHE_FLASH_ATTR user_done(void) {
 	i3= (chip_id & 0xff << 8);
 	i4= (chip_id & 0xff);
 
-	ws2812_init();
+
 
 	CreateMutux(&refreshMutext);
 
 	write_textwall_buffer(0, "W2  ", 4); // initial text while no commands
 
+	//OLED_Print(1, 4, "W2", 1);
+
 	os_timer_disarm(&framerefreshTimer);
 	os_timer_setfn(&framerefreshTimer, refreshFrameCb, NULL);
 	os_timer_arm(&framerefreshTimer, FRAME_REFRESH_SPEED, 0);
 
-	os_timer_disarm(&timeTimer);
-		os_timer_setfn(&timeTimer, timeCb, NULL);
-		os_timer_arm(&timeTimer, 10000, 0);
+//	os_timer_disarm(&timeTimer);
+//	os_timer_setfn(&timeTimer, timeCb, NULL);
+//	os_timer_arm(&timeTimer, 10000, 0);
 
 }
 
 void user_init() {
 	uart_init(BIT_RATE_115200, BIT_RATE_115200); //ReceiveUART, true); // baudrate, callback, eolchar, printftouart
+	ram_init();
+	ws2812_init();
+	i2c_init();
 
+	//OLED_I
+//
+//	OLED_Print(0, 0, "Text mode:", 1);
 	//gdb_init();
 
 	system_init_done_cb(user_done);

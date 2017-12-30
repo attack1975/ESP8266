@@ -6,7 +6,7 @@ SDK_BASE := ../../modules/modules_1_5_0/
 CUSTOM_LIBS := 
 LIBS := c gcc gcov hal pp phy net80211 lwip wpa ssl main driver crypto
 
-CFLAGS := -Werror  -DLWIP_OPEN_SRC
+CFLAGS := -Werror  -DLWIP_OPEN_SRC -O3
 TARGET		= led_shirt
 
 

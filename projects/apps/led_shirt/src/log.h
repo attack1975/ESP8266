@@ -11,6 +11,8 @@
 #define LOG_ON 0x01
 #define LOG_OFF 0x00
 
+#define LOG_DATA_TAG "Data"
+
 #define LOG_TRACE 0x00
 #define LOG_TRACE_TAG "TRACE"
 #define LOG_INFO 0x01
@@ -78,6 +80,11 @@
 	} \
 }while(0)
 
+#define LOG_D(debug, message, ...) do { \
+	if(debug == LOG_ON) { \
+		LOG(LOG_INFO, LOG_DATA_TAG, message, ##__VA_ARGS__); \
+	} \
+}while(0)
 
 #define LOG_I(debug, tag, message, ...) do { \
 	if(debug == LOG_ON) { \

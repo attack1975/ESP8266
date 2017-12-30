@@ -10,110 +10,75 @@
 #include "espmissingincludes.h"
 #include "font8x8_basic.h"
 #include "log.h"
+#include "spi_ram.h"
 
 static char framebuffer[BUFFERS * (COLUMNS *ROWS) * (COLORS)];
 static char bitmaptextbuffer[BUFFERS][(COLUMNS * TEXTROWS)][ROWS];
 int mTextLength = 0;
 
-void rainbow_calc(int progress, int * color)
-{
-	double r = 0.0;
-	double g = 0.0;
-	double b = 0.0;
-	double h = (double)(progress % 120) / 120;
-	int i = (int)(h * 6);
-	double f = h * 6.0 - i;
-	double q = 1 - f;
-
-	            switch (i % 6)
-	            {
-	                case 0:
-	                    r = 1;
-	                    g = f;
-	                    b = 0;
-	                    break;
-	                case 1:
-	                    r = q;
-	                    g = 1;
-	                    b = 0;
-	                    break;
-	                case 2:
-	                    r = 0;
-	                    g = 1;
-	                    b = f;
-	                    break;
-	                case 3:
-	                    r = 0;
-	                    g = q;
-	                    b = 1;
-	                    break;
-	                case 4:
-	                    r = f;
-	                    g = 0;
-	                    b = 1;
-	                    break;
-	                case 5:
-	                    r = 1;
-	                    g = 0;
-	                    b = q;
-	                    break;
-	            }
-
-	            color[0] = (r * 255);
-	            color[1] = (g * 255);
-	            color[2] = (b * 255);
-}
-void rainbow_copybuffer(int buffer, int frame) {
-	int c[3];
-
-
-	int count = 0;
-	for(int i = 0; i < COLUMNS; i++) {
-			for(int x = 0; x < ROWS; x++) {
-				rainbow_calc(count+frame, &c[0]);
-				setpixel(buffer, i, x,  c[0], c[1], c[2]);
-				count++;
-			}
-		 }
-
-	//set_buffer(buffer, c[0], c[1], c[2]);
-}
-
-void* mBuffers[500] = { 0 };
+char mBuffers[COLUMNS * ROWS * COLORS] = { 0 };
 extern int bufferrecord;
 extern int bufferframes;
 extern int bufferplay;
 
+char *  get_buffersaved(int buffer) {
+	os_printf("Returning buffer: %d - %d \r\n", buffer, bufferframes);
+	if(buffer >= bufferframes)
+		buffer = 0;
+	freebuffers();
+	long offset = buffer * (COLUMNS * ROWS * COLORS);
+	int len = COLUMNS * ROWS * COLORS;
+	os_printf("%d \r\n", (offset));
+	freebuffers();
+	for(int i = 0; i < len; i++) {
+		mBuffers[i] = read_byte(i + offset);
+
+	}
+
+	return &mBuffers[0];
+}
+
 void freebuffers() {
-	for(int i = 0; i < 500; i++) {
+	for(int i = 0; i < COLUMNS * ROWS * COLORS; i++) {
 		if(mBuffers[i] != 0) {
-			vPortFree(mBuffers[i]);
+			//vPortFree(mBuffers[i]);
 			mBuffers[i] = 0;
 		}
 	}
 }
 
-void ICACHE_FLASH_ATTR writestream(int buffer, char * data, int len) {
+void ram_memcpy(int off, char * dat, int len) {
+	long offset = off * (COLUMNS * ROWS * COLORS);
+
+	os_printf("writing buffer: %d - len:%d \r\n", offset, len);
+
+	for(int i = 0; i < len; i++) {
+		write_byte(i+offset , dat[i]);
+		mBuffers[i] = dat[i];
+	}
+}
+
+void  writestream(int buffer, char * data, int len) {
 	if(len > (COLUMNS * ROWS * COLORS)) {
 		len = COLUMNS * ROWS * COLORS;
 	}
 	LOG_T(LOG_FRAMEDRIVER,  LOG_FRAMEDRIVER_TAG, "Writing stream to framebuffer");
 
 	if(bufferrecord == 1) {
-		if(mBuffers[bufferframes] == 0) {
-			mBuffers[bufferframes] = (void*) pvPortMalloc((size_t) len);
-		}
+//		if(mBuffers[bufferframes] == 0) {
+//			mBuffers[bufferframes] = (void*) pvPortMalloc((size_t) len);
+//		}
 		int prevcount = 0;
 		if(bufferframes != 0) {
 			prevcount = bufferframes - 1;
 		} else {
 			ets_memcpy(&framebuffer[(buffer * COLUMNS * ROWS * COLORS)], data, len);
 		}
-		if(ets_memcmp(mBuffers[prevcount], data, len) != 0 || bufferframes == 0) {
-			ets_memcpy(mBuffers[bufferframes], data, len);
+		if(ets_memcmp(&mBuffers[0], data, len) != 0 || bufferframes == 0) {
+			ram_memcpy(bufferframes, data, len);
 			bufferframes++;
 		}
-		if(system_get_free_heap_size() < 2000) {
+		if(bufferframes >= 80) {
 			bufferrecord = 0;
 			bufferplay = 1;
 		}
@@ -193,13 +158,7 @@ void ICACHE_FLASH_ATTR write_texttowall(int buffer, int textbuffer, long offset,
 void setled(char* data, int len ,int dim) {
 	WS2812OutBuffer(data, len, dim);
 }
-char * ICACHE_FLASH_ATTR get_buffersaved(int buffer) {
-	//os_printf("Returning buffer: %d - %d", buffer, bufferframes);
-	if(buffer >= bufferframes)
-		buffer = 0;
 
-	return mBuffers[buffer];
-}
 
 char * ICACHE_FLASH_ATTR get_startbuffer(int buffer) {
 	return &framebuffer[buffer * COLUMNS * ROWS * COLORS];
